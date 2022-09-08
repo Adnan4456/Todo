@@ -14,6 +14,7 @@ import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,17 +23,22 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.lifecycleScope
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -96,6 +102,9 @@ class TodoActivity : ComponentActivity() {
     @Composable
     fun AddDialogBox(openDialog: MutableState<Boolean>){
 
+        // Fetching the Local Context
+        val mContext = LocalContext.current
+
         val year : Int
         val month: Int
         val day: Int
@@ -106,13 +115,18 @@ class TodoActivity : ComponentActivity() {
         day = calender.get(Calendar.DAY_OF_MONTH)
         val title = remember { mutableStateOf("")}
         val des = remember { mutableStateOf("")}
-        val date = remember { mutableStateOf("")}
+        val date = remember { mutableStateOf("Date")}
+        var  datePicked: String? = null
+
+//        link for image picker view
+//        https://sgkantamani.medium.com/how-to-show-date-picker-in-jetpack-compose-8bc77a3ce408
 
         //date picker build in dialog
         val datePickerDialog = DatePickerDialog(
-            applicationContext,
+            mContext,
             { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
                 date.value = "$dayOfMonth/$month/$year"
+                datePicked = "$dayOfMonth/$month/$year"
             }, year, month, day
         )
 
@@ -124,7 +138,7 @@ class TodoActivity : ComponentActivity() {
 
             },
                 title = {
-                    Text(text = "Add new Record " , modifier = Modifier
+                    Text(text = "Add task " , modifier = Modifier
                         .padding(16.dp)
                         .fillMaxWidth())
                 },
@@ -132,7 +146,7 @@ class TodoActivity : ComponentActivity() {
                     Column(
                         modifier = Modifier
                             .padding(5.dp)
-                            .fillMaxWidth(),
+//                            .fillMaxWidth(),
 //                            .fillMaxSize(),
                     ) {
                         Spacer(modifier = Modifier.size(16.dp))
@@ -149,8 +163,6 @@ class TodoActivity : ComponentActivity() {
                             } ,
                             modifier = Modifier.fillMaxWidth()
                         )
-//                        Spacer(modifier = Modifier.size(16.dp))
-
                         OutlinedTextField(
                             value = des.value,
                             onValueChange = {
@@ -164,29 +176,60 @@ class TodoActivity : ComponentActivity() {
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
+                        //start date picker code
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentSize(Alignment.TopStart)
+                                .padding(top = 10.dp)
+                                .border(0.5.dp, MaterialTheme.colors.onSurface.copy(alpha = 0.5f))
+                                .clickable {
+                                    datePickerDialog.show()
+                                }
+                        ){
 
-//                        OutlinedTextField(
-//                            value = date.value,
-//                            onValueChange = {
-//                                date.value = it
-//                            },
-//                            placeholder = {
-//                                Text(text = "Select date")
-//                            },
-//                            label = {
-//                                Text(text = "Select date")
-//                            },
-//                            modifier = Modifier.fillMaxWidth()
-//                                .clickable {
-//                                    datePickerDialog.show()
-//                                }
-//                        )
+                            ConstraintLayout(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp)
+                            ) {
+                                val (lable, iconView) = createRefs()
+
+                                Text(
+                                    text= "${date.value}",
+                                    color = MaterialTheme.colors.onSurface,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .constrainAs(lable) {
+                                            top.linkTo(parent.top)
+                                            bottom.linkTo(parent.bottom)
+                                            start.linkTo(parent.start)
+                                            end.linkTo(iconView.start)
+                                            width = Dimension.fillToConstraints
+                                        }
+                                )
+
+                                Icon(
+                                    imageVector = Icons.Default.DateRange,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .size(20.dp, 20.dp)
+                                        .constrainAs(iconView) {
+                                            end.linkTo(parent.end)
+                                            top.linkTo(parent.top)
+                                            bottom.linkTo(parent.bottom)
+                                        },
+                                    tint = MaterialTheme.colors.onSurface
+                                )
+                            }
+                        }
+                        //end
 
                     }
                 },
                 confirmButton = {
                     OutlinedButton(onClick = {
-                        insert(title ,des)
+                        insert(title ,des , date)
                         openDialog.value = false
                     },
                         modifier = Modifier.padding(end = 26.dp)
@@ -342,17 +385,16 @@ class TodoActivity : ComponentActivity() {
 
 
     //calling this function when save button is clicked
-    private fun insert(title: MutableState<String> , des : MutableState<String>){
+    private fun insert(title: MutableState<String> , des : MutableState<String> , date: MutableState<String>){
 
         lifecycleScope.launchWhenCreated {
 
-            if (!TextUtils.isEmpty(title.value) && !TextUtils.isEmpty(des.value))
+            if (!TextUtils.isEmpty(title.value) && !TextUtils.isEmpty(des.value) && !date.value.equals("Date"))
             {
                 todoViewModel.insert(
                     Todo(title.value , des.value)
                 )
                 Toast.makeText(this@TodoActivity , "Record inserted ",Toast.LENGTH_LONG).show()
-
             }
             else{
                 Toast.makeText(this@TodoActivity , "Field is empty",Toast.LENGTH_LONG).show()
