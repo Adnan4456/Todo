@@ -15,6 +15,7 @@ abstract class TodoDAO : BaseDAO<Todo>{
      * Get all data from the Data table.
      */
     @Query("SELECT * FROM todoTable")
+     abstract fun getData(): PagingSource<Int , Todo>
 //    abstract fun getData(): Flow<List<Todo>>
-    abstract fun getData(): PagingSource<Int , Todo>
+
 }

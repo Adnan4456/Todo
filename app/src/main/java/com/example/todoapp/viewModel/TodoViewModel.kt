@@ -19,16 +19,23 @@ class TodoViewModel
     : ViewModel() {
 
     init {
-//        getAllTodo()
     }
 
     //to store data use MutableState in jetpack compose
 //        val response:MutableState<List<Todo>> = mutableStateOf(listOf())
 
-        fun insert(todo: Todo) = viewModelScope.launch {
-            //it is a suspended function therefore call in viewModelScope coroutine
-            todoRepository.insert(todo)
-        }
+    fun insert(todo: Todo) = viewModelScope.launch {
+        //it is a suspended function therefore call in viewModelScope coroutine
+        todoRepository.insert(todo)
+    }
+
+    fun deleteTask(todo: Todo) = viewModelScope.launch {
+        todoRepository.delete(todo)
+    }
+
+    fun update(todo: Todo) = viewModelScope.launch {
+        todoRepository.update(todo)
+    }
 
     val response = Pager(
             PagingConfig(pageSize = 10)

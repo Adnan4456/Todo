@@ -22,19 +22,18 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.focus.FocusRequester.Companion.createRefs
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -49,9 +48,11 @@ import com.example.todoapp.viewModel.TodoViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 
+
 @AndroidEntryPoint
 class TodoActivity : ComponentActivity() {
 
+    //Kotlin delegation using by keyword
     private val todoViewModel:TodoViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,25 +61,26 @@ class TodoActivity : ComponentActivity() {
         setContent {
             ToDoAppTheme{
                 Surface(color =  MaterialTheme.colors.background) {
-
                     AddToolbar()
-
                 }
             }
         }
     }
 
-
     @Composable
     fun AddToolbar(){
+        val scaffoldState = rememberScaffoldState()
+        val scope = rememberCoroutineScope()
+
         Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(text = "Todo App")
-                    }
-                )
-            },
+            scaffoldState = scaffoldState,
+//            topBar = {
+//                TopAppBar(
+//                    title = {
+//                        Text(text = "Todo App")
+//                    }
+//                )
+//            },
             floatingActionButton = {
 
                 val openDialog = remember {
@@ -87,17 +89,18 @@ class TodoActivity : ComponentActivity() {
                 FloatingActionButton(onClick = {
                     //when click on FAB dialog box show
                     openDialog.value = true
-                }) {
+                })
+                {
+                    Icon(Icons.Default.Add, contentDescription = "Add")
                     //Therefore call dialog function here
                     AddDialogBox(openDialog = openDialog)
-                    Icon(Icons.Default.Add, contentDescription = "Add")
+
                 }
             }
         ) {
             RecyclerView(todoViewModel)
         }
     }
-
 
     @Composable
     fun AddDialogBox(openDialog: MutableState<Boolean>){
@@ -139,27 +142,29 @@ class TodoActivity : ComponentActivity() {
             },
                 title = {
                     Text(text = "Add task " , modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth())
+//                        .padding(8.dp)
+                        .fillMaxWidth(),
+                        style = MaterialTheme.typography.h6
+                    )
                 },
                 text = {
+//                    Spacer(modifier = Modifier.size(16.dp))
                     Column(
                         modifier = Modifier
                             .padding(5.dp)
-//                            .fillMaxWidth(),
-//                            .fillMaxSize(),
+
                     ) {
-                        Spacer(modifier = Modifier.size(16.dp))
+
                         OutlinedTextField(
                             value = title.value,
                             onValueChange = {
                                 title.value = it
                             },
                             placeholder = {
-                                Text(text = "Enter Title")
+                               // Text(text = "Enter Title")
                             },
                             label = {
-                                Text(text = "Enter title")
+                                Text(text = "Enter Title")
                             } ,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -169,10 +174,10 @@ class TodoActivity : ComponentActivity() {
                                 des.value = it
                             },
                             placeholder = {
-                                Text(text = "Enter Description")
+//                                Text(text = "Enter Description")
                             },
                             label = {
-                                Text(text = "Enter description")
+                                Text(text = "Enter Description")
                             },
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -187,7 +192,7 @@ class TodoActivity : ComponentActivity() {
                                     datePickerDialog.show()
                                 }
                         ){
-
+                            Spacer(modifier = Modifier.size(16.dp))
                             ConstraintLayout(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -228,91 +233,190 @@ class TodoActivity : ComponentActivity() {
                     }
                 },
                 confirmButton = {
-                    OutlinedButton(onClick = {
-                        insert(title ,des , date)
-                        openDialog.value = false
-                    },
-                        modifier = Modifier.padding(end = 26.dp)
+                    Button(
+                        onClick = {
+                            insert(title, des, date)
+                            openDialog.value = false
+                        },
+                        // Uses ButtonDefaults.ContentPadding by default
+                        contentPadding = PaddingValues(
+                            start = 10.dp,
+                            top = 12.dp,
+                            end = 10.dp,
+                            bottom = 12.dp
+                        ),
+                        // modifier = Modifier.padding(end = 26.dp)
                     ) {
-                        Text(text = "Save" , modifier = Modifier.padding(1.dp))
+                        // Inner content including an icon and a text label
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = "Favorite",
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text(text = "Save")
                     }
-                })
+                },
+                dismissButton = {
+                    Button(
+                        onClick = {
+                            openDialog.value = false
+                        },
+                        // Uses ButtonDefaults.ContentPadding by default
+                        contentPadding = PaddingValues(
+                            start = 10.dp,
+                            top = 12.dp,
+                            end = 10.dp,
+                            bottom = 12.dp
+                        ),
+                        //  modifier = Modifier.padding(end = 26.dp)
+                    ) {
+
+                        // Inner content including an icon and a text label
+                        Icon(
+                            Icons.Filled.Cancel,
+                            contentDescription = "Cancel",
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text(text = "Cancel")
+                    }
+                }
+            )
         }
     }
 
     @Composable
-    fun EachRow(todo: Todo){
+    fun EachRow(
+        todo:Todo ,
+        checked: Boolean,
+        onCheckedChange: (Boolean) -> Unit,
+        onClose: () -> Unit,
+        modifier: Modifier = Modifier
+    ){
         Card(
             modifier = Modifier
                 .padding(8.dp)
                 .fillMaxWidth(),
             elevation = 5.dp,
-            shape = RoundedCornerShape(4.dp)
+            shape = RoundedCornerShape(2.dp)
         ) {
-            Column(
-                modifier = Modifier.padding(10.dp)
-            ) {
-                Text(text = todo.title , fontWeight = FontWeight.ExtraBold)
-                Text(text = todo.description , fontStyle = FontStyle.Italic)
+            Row(
+                modifier = modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+
+            ){
+
+                Column(
+                    modifier = Modifier
+                        .padding(8.dp)
+                        .weight(1f)
+                ) {
+                    Text(
+                        text = todo.title ,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.h6
+                    )
+                    Spacer(modifier = Modifier.padding(2.dp))
+                    Text(
+                        text = todo.description,
+                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.body1)
+                }
+
+                Checkbox(
+                    checked = checked,
+                    onCheckedChange = onCheckedChange
+                )
+                IconButton(onClick = onClose) {
+                    Icon(Icons.Filled.Close, contentDescription = "Close")
+                }
             }
         }
     }
 
     @Composable
+    fun EachRowStateless (todo: Todo){
+
+        EachRow(
+            todo = todo,
+            checked = todo.status,
+            onCheckedChange =  { newValue ->
+                todo.status = newValue
+                 //now update this value in database through viewmodel
+                  todoViewModel.update(todo)},
+            onClose = {
+                //delete record from database
+                todoViewModel.deleteTask(todo)
+            })
+    }
+    @Composable
     fun RecyclerView(todoViewModel: TodoViewModel){
 
-        val todos = todoViewModel.response.collectAsLazyPagingItems()
+        Surface(
+            color = MaterialTheme.colors.background
+        ) {
 
-        LazyColumn {
-            items(todos){todo ->
-                todo?.let {
-                    EachRow(todo = todo)
-                }
-            }
-            when(todos.loadState.append){
-
-                is LoadState.NotLoading -> Unit
-                LoadState.Loading -> {
-                    item {
-                        LoadingItem()
-                    }
-                }
-                is LoadState.Error -> {
-                    item {
-
-                    }
-                }
-            }
-
-            when (todos.loadState.refresh){
-
-                is LoadState.NotLoading -> Unit
-                LoadState.Loading -> {
-                    item {
-
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight(),
-                            contentAlignment = Alignment.Center
-                        ){
-                            LoadingItem()
+            val todos = todoViewModel.response.collectAsLazyPagingItems()
+            if(todos != null){
+                LazyColumn {
+                    items(todos){todo ->
+                        todo?.let {
+                            //EachRow(todo = todo)
+                            EachRowStateless(todo = todo)
                         }
                     }
-                }
-                is LoadState.Error -> {
-                    item {
+                    when(todos.loadState.append){
 
-                        ErrorItem(message = "Network error occurred.")
+                        is LoadState.NotLoading -> Unit
+                        LoadState.Loading -> {
+                            item {
+                                LoadingItem()
+                            }
+                        }
+                        is LoadState.Error -> {
+                            item {
 
+                            }
+                        }
                     }
-                }
-            }
+
+                    when (todos.loadState.refresh){
+
+                        is LoadState.NotLoading -> Unit
+                        LoadState.Loading -> {
+                            item {
+
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(),
+                                    contentAlignment = Alignment.Center
+                                ){
+                                    LoadingItem()
+                                }
+                            }
+                        }
+                        is LoadState.Error -> {
+                            item {
+
+                                ErrorItem(message = "Network error occurred.")
+
+                            }
+                        }
+                    }
 
 //          items(todoViewModel.response.value) { todo ->
 //              EachRow(todo = todo)
 //          }
-      }
+                }
+            }
+            else{
+                Text(text = "No Record found",
+                    style = MaterialTheme.typography.h6)
+            }
+        }
     }
 
     @Composable
@@ -383,7 +487,6 @@ class TodoActivity : ComponentActivity() {
             strokeWidth = 10.dp)
     }
 
-
     //calling this function when save button is clicked
     private fun insert(title: MutableState<String> , des : MutableState<String> , date: MutableState<String>){
 
@@ -392,7 +495,7 @@ class TodoActivity : ComponentActivity() {
             if (!TextUtils.isEmpty(title.value) && !TextUtils.isEmpty(des.value) && !date.value.equals("Date"))
             {
                 todoViewModel.insert(
-                    Todo(title.value , des.value)
+                    Todo(title.value , des.value , false ,date.value)
                 )
                 Toast.makeText(this@TodoActivity , "Record inserted ",Toast.LENGTH_LONG).show()
             }
@@ -400,5 +503,27 @@ class TodoActivity : ComponentActivity() {
                 Toast.makeText(this@TodoActivity , "Field is empty",Toast.LENGTH_LONG).show()
             }
         }
+    }
+
+    @Preview
+    @Composable
+    fun DialogePreview(){
+        val openDialog = remember {
+            mutableStateOf(true) //dialog box is not open right now
+        }
+        AddDialogBox(openDialog = openDialog)
+    }
+
+    @Preview
+    @Composable
+    fun EachRowPreview(){
+        var todo = Todo("Title","Description" , false  , "date ")
+        EachRow(todo = todo, checked = false, onCheckedChange = { Boolean -> Unit } , onClose = {  })
+    }
+
+    @Preview
+    @Composable
+    fun AddToolbarPreview(){
+        AddToolbar()
     }
 }

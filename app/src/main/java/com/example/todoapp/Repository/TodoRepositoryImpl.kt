@@ -16,10 +16,22 @@ class TodoRepositoryImpl
 
     override suspend fun insert(todo: Todo) {
 
-        //to run on background thread .
+        //to run function on background IO thread .
         withContext(Dispatchers.IO){
             dao.insert(todo)
         }
+    }
+
+    override suspend fun delete(todo: Todo) {
+        withContext(Dispatchers.IO){
+            dao.delete(todo)
+        }
+    }
+
+    override suspend fun update(todo: Todo) {
+      withContext(Dispatchers.IO){
+          dao.update(todo)
+      }
     }
 
     override  fun getAllTodo(): PagingSource<Int, Todo> {
