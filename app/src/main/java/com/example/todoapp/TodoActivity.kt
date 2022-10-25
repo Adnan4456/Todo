@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -98,10 +99,33 @@ class TodoActivity : ComponentActivity() {
                 }
             }
         ) {
+            SearchBar()
             RecyclerView(todoViewModel)
         }
     }
 
+
+    @Composable
+    fun SearchBar(
+        modifier: Modifier =    Modifier
+    ){
+        TextField(value = "",
+            onValueChange = {},
+            leadingIcon = {
+                Icon( Icons.Default.Search, contentDescription = null )
+            },
+            placeholder = {
+                Text(stringResource(id = R.string.placeholder_search))
+            },
+            colors = TextFieldDefaults.textFieldColors(
+                //getting color from material library set by default.
+                backgroundColor = MaterialTheme.colors.surface
+            ),
+            modifier = modifier
+                .fillMaxWidth()
+                .heightIn(min = 56.dp)
+        )
+    }
     @Composable
     fun AddDialogBox(openDialog: MutableState<Boolean>){
 
@@ -521,6 +545,11 @@ class TodoActivity : ComponentActivity() {
         EachRow(todo = todo, checked = false, onCheckedChange = { Boolean -> Unit } , onClose = {  })
     }
 
+    @Preview
+    @Composable
+    fun SearchBarPreview() {
+        SearchBar(Modifier.padding(8.dp))
+    }
     @Preview
     @Composable
     fun AddToolbarPreview(){
