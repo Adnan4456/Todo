@@ -1,11 +1,9 @@
 ## ToDo App
 - Android  application written with kotlin programming language.
-- You can save you task in Room database and get all the list ok tasks using paging 3 library then comvert into flow.
-- You can mark complete and change changes will also reflect in database.
+- You can save you task in Room database and get all the list of tasks using paging 3 library then convert into flow.
+- You can mark the task as completed and changes will also reflect in database.
 - You can delete task from database.
 <br>
-
-Minimum API level supported is: 24
 
 <br>
 - Build System: [Gradle](https://gradle.org)
