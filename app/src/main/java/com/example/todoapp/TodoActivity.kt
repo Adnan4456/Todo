@@ -24,8 +24,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
+ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
@@ -71,7 +70,7 @@ class TodoActivity : ComponentActivity() {
     @Composable
     fun AddToolbar(){
         val scaffoldState = rememberScaffoldState()
-        val scope = rememberCoroutineScope()
+       // val scope = rememberCoroutineScope()
 
         Scaffold(
             scaffoldState = scaffoldState,
@@ -143,7 +142,7 @@ class TodoActivity : ComponentActivity() {
         val title = remember { mutableStateOf("")}
         val des = remember { mutableStateOf("")}
         val date = remember { mutableStateOf("Date")}
-        var  datePicked: String? = null
+       // var  datePicked: String? = null
 
 //        link for image picker view
 //        https://sgkantamani.medium.com/how-to-show-date-picker-in-jetpack-compose-8bc77a3ce408
@@ -153,7 +152,7 @@ class TodoActivity : ComponentActivity() {
             mContext,
             { _: DatePicker, year: Int, month: Int, dayOfMonth: Int ->
                 date.value = "$dayOfMonth/$month/$year"
-                datePicked = "$dayOfMonth/$month/$year"
+              //  datePicked = "$dayOfMonth/$month/$year"
             }, year, month, day
         )
 
@@ -541,7 +540,7 @@ class TodoActivity : ComponentActivity() {
     @Preview
     @Composable
     fun EachRowPreview(){
-        var todo = Todo("Title","Description" , false  , "date ")
+        val todo = Todo("Title","Description" , false  , "date ")
         EachRow(todo = todo, checked = false, onCheckedChange = { Boolean -> Unit } , onClose = {  })
     }
 
