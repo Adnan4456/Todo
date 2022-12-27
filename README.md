@@ -34,7 +34,7 @@
  * [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) - Used to store and manage UI related data in a lifecycle concious way.
  * [Flow API](https://kotlinlang.org/docs/flow.html#sequences) - In coroutines, a flow is a type that can emit multiple values sequentially, as opposed to suspend functions that return only a single value.
 <br>
-<img drc = "assets/Screenshot_1666733413.png">
-<img drc = "assets/Screenshot_1666733418.png">
-<img drc = "assets/Screenshot_1666733443.png">
+<img src = "assets/Screenshot_1666733413.png">
+<img src = "assets/Screenshot_1666733418.png">
+<img src = "assets/Screenshot_1666733443.png">
 
